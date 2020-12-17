@@ -26,7 +26,7 @@ class CMakeInstall:
         self.download_backoff_factor = 10
 
         if platform.system() == "Darwin":
-            cmake_platform = "Darwin-x86_64"
+            cmake_platform = "macos-universal"
             cmake_archive_ext = ".tar.gz"
             cmake_binary_dir = "CMake.app/Contents/bin"
         elif platform.system() == "Linux":
