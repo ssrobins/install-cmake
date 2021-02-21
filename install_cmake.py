@@ -30,7 +30,7 @@ class CMakeInstall:
             cmake_archive_ext = ".tar.gz"
             cmake_binary_dir = "CMake.app/Contents/bin"
         elif platform.system() == "Linux":
-            cmake_platform = "Linux-x86_64"
+            cmake_platform = "linux-x86_64"
             cmake_archive_ext = ".tar.gz"
             cmake_binary_dir = "bin"
         elif platform.system() == "Windows":
