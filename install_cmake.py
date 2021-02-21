@@ -107,6 +107,7 @@ class CMakeInstall:
         else:
             print("Unsupported archive: {self.archive}", flush=True)
             exit(1)
+        subprocess.run(os.path.join(self.path, "cmake --version"), shell=True, check=True)
 
 
     def set_path(self):
@@ -131,7 +132,7 @@ def main():
     cmake_args = parser.parse_args()
 
     if cmake_args.test:
-            subprocess.run(os.path.join(os.path.dirname(__file__), "install_cmake_tests.py"), shell=True, check=True)
+        subprocess.run(os.path.join(os.path.dirname(__file__), "install_cmake_tests.py"), shell=True, check=True)
 
     cmake_install = CMakeInstall(cmake_args.version)
     if cmake_install.requested_cmake_is_different():
