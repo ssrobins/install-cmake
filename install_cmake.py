@@ -11,7 +11,7 @@ import zipfile
 from bs4 import BeautifulSoup
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
-from urllib.request import urlopen
+from urllib.request import build_opener, HTTPCookieProcessor, install_opener, Request, urlopen
 
 
 class CMakeInstall:
@@ -46,7 +46,10 @@ class CMakeInstall:
 
 
     def get_latest_cmake_version_cmake(self):
-        page = urlopen("https://cmake.org/download/")
+        opener = build_opener(HTTPCookieProcessor())
+        install_opener(opener)
+        req = Request("https://cmake.org/download/", headers={"User-Agent": "Mozilla/72 (X11; Linux i686)"})
+        page = urlopen(req).read().decode('utf8', errors='ignore')
         soup = BeautifulSoup(page, "html.parser")
         version_items = soup.find("h3").text.strip().split()
         cmake_version = version_items[2].strip("()")
