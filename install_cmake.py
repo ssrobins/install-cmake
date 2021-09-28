@@ -65,7 +65,7 @@ class CMakeInstall:
 
 
     def requested_cmake_is_different(self):
-        cmake_version_output = subprocess.run("cmake --version", shell=True, check=True, capture_output=True)
+        cmake_version_output = subprocess.run("cmake --version", shell=True, check=True, stdout=subprocess.PIPE)
         cmake_version_output = cmake_version_output.stdout.decode("utf-8")
         installed_cmake_version = self.get_installed_cmake_version(cmake_version_output)
         if installed_cmake_version == self.version:
