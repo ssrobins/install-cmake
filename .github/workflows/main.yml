@@ -36,3 +36,8 @@ jobs:
         uses: ./
         with:
           version: 3.23.0
+
+      - name: Install CMake 3.25.0-rc0
+        uses: ./
+        with:
+          version: 3.25.0-rc0
