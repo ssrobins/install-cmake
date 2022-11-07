@@ -17,5 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install Python requirements
+        run: pip3 install BeautifulSoup4 requests
+
       - name: Run unit tests
         run: python install_cmake_tests.py
