@@ -35,4 +35,4 @@ jobs:
       - name: Install CMake 3.23.0
         uses: ./
         with:
-          version: '3.23.0'
+          version: 3.23.0
