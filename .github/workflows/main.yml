@@ -23,10 +23,13 @@ jobs:
       - name: Python version
         run: python3 --version
 
-      - name: Install Python requirements
-        run: pip3 install BeautifulSoup4 requests
-
       - name: Run unit tests
         run: python3 install_cmake_tests.py
 
-      - uses: ./
+      - name: Install CMake (default)
+        uses: ./
+
+      - name: Install CMake 3.23.0
+        uses: ./
+        with:
+          version: '3.23.0'
