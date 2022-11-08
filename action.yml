@@ -15,7 +15,7 @@ runs:
         pip3 install BeautifulSoup4 requests
         if [ "$RUNNER_OS" == "Windows" ]; then python_cmd=python; else python_cmd=python3; fi
         if [ ! -z "${{ inputs.version }}" ]; then input_version="--version ${{ inputs.version }}"; fi
-        if [ "${{ inputs.release-candidate }}" = true ]; then $input_rc=" --rc"; fi
+        if [ "${{ inputs.release-candidate }}" = true ]; then input_rc=" --rc"; fi
         echo
         $python_cmd $GITHUB_ACTION_PATH/install_cmake.py $input_version$input_rc
       shell: bash
