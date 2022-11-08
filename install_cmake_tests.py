@@ -5,7 +5,7 @@ from install_cmake import *
 
 class TestMethods(unittest.TestCase):
     def test_get_installed_cmake_version(self):
-        cmake_install = CMakeInstall(None)
+        cmake_install = CMakeInstall(None, None)
         self.assertEqual(cmake_install.get_installed_cmake_version(""), "")
         self.assertEqual(cmake_install.get_installed_cmake_version("blah"), "")
         self.assertEqual(cmake_install.get_installed_cmake_version("3"), "")

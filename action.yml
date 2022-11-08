@@ -3,6 +3,10 @@ inputs:
   version:
     description: 'CMake version in the form 3.18.4 or 3.19.0-rc2 for RCs'
     required: false
+  release-candidate:
+    description: 'Consider a release candidate when selecting the latest version'
+    required: false
+    default: false
 runs:
   using: "composite"
   steps:
@@ -10,7 +14,8 @@ runs:
       run: |
         pip3 install BeautifulSoup4 requests
         if [ "$RUNNER_OS" == "Windows" ]; then python_cmd=python; else python_cmd=python3; fi
-        if [ ! -z "${{ inputs.version }}" ]; then python_cmd_input="--version ${{ inputs.version }}"; fi
+        if [ ! -z "${{ inputs.version }}" ]; then input_version="--version ${{ inputs.version }}"; fi
+        if [ "${{ inputs.release-candidate }}" = true ]; then input_rc=" --rc"; fi
         echo
-        $python_cmd $GITHUB_ACTION_PATH/install_cmake.py $python_cmd_input
+        $python_cmd $GITHUB_ACTION_PATH/install_cmake.py $input_version$input_rc
       shell: bash
