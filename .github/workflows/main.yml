@@ -32,6 +32,11 @@ jobs:
       - name: Install CMake (default)
         uses: ./
 
+      - name: Install CMake RC (if available)
+        uses: ./
+        with:
+          release-candidate: true
+
       - name: Install CMake 3.23.0
         uses: ./
         with:

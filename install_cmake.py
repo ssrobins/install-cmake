@@ -15,11 +15,15 @@ from urllib.request import build_opener, HTTPCookieProcessor, install_opener, Re
 
 
 class CMakeInstall:
-    def __init__(self, version):
+    def __init__(self, version, rc):
+        if rc:
+            self.rc = True
+        else:
+            self.rc = False
         if version:
             self.version = version
         else:
-            self.version = self.get_latest_cmake_version_cmake()
+            self.version = self.get_latest_cmake_version()
 
         self.download_timeout_seconds = 10
         self.download_retry_count = 3
@@ -45,14 +49,29 @@ class CMakeInstall:
         self.path = os.path.join(self.script_path, cmake_dir, cmake_binary_dir)
 
 
-    def get_latest_cmake_version_cmake(self):
+    def suitable_release_found(self, release_string):
+        release_found = False
+        if ((self.rc and "Release Candidate" in release_string) or
+            ("Latest Release" in release_string)):
+            release_found = True
+        return release_found
+
+
+    def get_latest_cmake_version(self):
         opener = build_opener(HTTPCookieProcessor())
         install_opener(opener)
         req = Request("https://cmake.org/download/", headers={"User-Agent": "Mozilla/72 (X11; Linux i686)"})
         page = urlopen(req).read().decode('utf8', errors='ignore')
         soup = BeautifulSoup(page, "html.parser")
-        version_items = soup.find("h3").text.strip().split()
-        cmake_version = version_items[2].strip("()")
+
+        h3_tag_contents = soup.findAll("h3")
+        version_text_raw = None
+        for h3_tag_contents in h3_tag_contents:
+            if self.suitable_release_found(h3_tag_contents.text):
+                version_text_raw = h3_tag_contents.text
+                break
+
+        cmake_version = version_text_raw.split()[2].strip("()")
         return cmake_version
 
 
@@ -126,6 +145,11 @@ def main():
     parser.add_argument("--version",
         help="CMake version in the form 3.18.4 or 3.19.0-rc2 for RCs", required=False
     )
+    parser.add_argument("--rc",
+        action="store_true",
+        required=False,
+        help="Consider a release candidate when selecting the latest version"
+    )
     parser.add_argument("--test",
         action="store_true",
         required=False,
@@ -137,7 +161,7 @@ def main():
     if cmake_args.test:
         subprocess.run(os.path.join(os.path.dirname(__file__), "install_cmake_tests.py"), shell=True, check=True)
 
-    cmake_install = CMakeInstall(cmake_args.version)
+    cmake_install = CMakeInstall(cmake_args.version, cmake_args.rc)
     if cmake_install.requested_cmake_is_different():
         cmake_install.download()
         cmake_install.extract()
