@@ -6,24 +6,33 @@ import platform
 import re
 import requests
 import subprocess
+import sys
 import tarfile
 import zipfile
 from bs4 import BeautifulSoup
+from packaging import version
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 from urllib.request import build_opener, HTTPCookieProcessor, install_opener, Request, urlopen
 
 
 class CMakeInstall:
-    def __init__(self, version, rc):
+    def __init__(self, cmake_version, rc):
         if rc:
             self.rc = True
         else:
             self.rc = False
-        if version:
-            self.version = version
+        if cmake_version:
+            self.version = cmake_version
         else:
             self.version = self.get_latest_cmake_version()
+
+        minimum_version = "3.20.0"
+        if version.parse(self.version) < version.parse(minimum_version):
+            print(f"CMake {self.version} is not supported, the version must be {minimum_version} or higher.", flush=True)
+            print("If you'd like to make a case for broader support, please post to:", flush=True)
+            print("https://github.com/ssrobins/install-cmake/issues", flush=True)
+            sys.exit(1)
 
         self.download_timeout_seconds = 10
         self.download_retry_count = 3
