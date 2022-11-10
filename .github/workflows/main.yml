@@ -45,4 +45,4 @@ jobs:
       - name: Install CMake 3.19.1 (minimum?)
         uses: ./
         with:
-          version: 3.19.1
+          version: 3.19.2
