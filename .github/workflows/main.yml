@@ -51,3 +51,4 @@ jobs:
         uses: ./
         with:
           version: 3.19.0
+        continue-on-error: true
