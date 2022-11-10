@@ -46,3 +46,8 @@ jobs:
         uses: ./
         with:
           version: 3.20.0
+
+      - name: Install CMake 3.19.0 (not supported)
+        uses: ./
+        with:
+          version: 3.19.0
