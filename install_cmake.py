@@ -120,6 +120,7 @@ class CMakeInstall:
             request.raise_for_status()
         except requests.exceptions.RequestException as error:
             print("Download failed", flush=True)
+            print("Check https://github.com/Kitware/CMake/releases to make sure you have a valid version")
             print(error, flush=True)
             exit(1)
 
