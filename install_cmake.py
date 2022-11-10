@@ -143,7 +143,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--version",
-        help="CMake version in the form 3.18.4 or 3.19.0-rc2 for RCs", required=False
+        help="CMake version in the form 3.24.3 or 3.25.0-rc4 for RCs", required=False
     )
     parser.add_argument("--rc",
         action="store_true",
