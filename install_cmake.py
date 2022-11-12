@@ -20,6 +20,14 @@ from urllib3.util import Retry
 import requests
 
 
+def get_installed_cmake_version(cmake_version_output):
+    cmake_version = ""
+    match = re.search(r"\d+\.\d+\.\d+(\-rc\d+)?", cmake_version_output)
+    if match:
+        cmake_version = match.group(0)
+    return cmake_version
+
+
 class CMakeInstall:
     def __init__(self, cmake_version, release_candidate):
         if release_candidate:
@@ -90,19 +98,11 @@ class CMakeInstall:
         return cmake_version
 
 
-    def get_installed_cmake_version(self, cmake_version_output):
-        cmake_version = ""
-        match = re.search(r"\d+\.\d+\.\d+(\-rc\d+)?", cmake_version_output)
-        if match:
-            cmake_version = match.group(0)
-        return cmake_version
-
-
     def requested_cmake_is_different(self):
         cmake_version_output = subprocess.run(
             "cmake --version", shell=True, check=True, stdout=subprocess.PIPE)
         cmake_version_output = cmake_version_output.stdout.decode("utf-8")
-        installed_cmake_version = self.get_installed_cmake_version(cmake_version_output)
+        installed_cmake_version = get_installed_cmake_version(cmake_version_output)
         if installed_cmake_version == self.version:
             print(f"Requested CMake {self.version} matches what's already installed", flush=True)
             return False
