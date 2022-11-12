@@ -23,8 +23,13 @@ jobs:
       - name: Python version
         run: python3 --version
 
-      - name: Install Python requirements
+      - name: Install dependencies
         run: pip3 install -r requirements.txt
+
+      - name: Run pylint
+        run: |
+          pip3 install pylint
+          pylint find . -iname "*.py" | xargs pylint
 
       - name: Run unit tests
         run: python3 install_cmake_tests.py
