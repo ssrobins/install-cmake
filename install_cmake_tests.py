@@ -8,6 +8,22 @@ import unittest
 from install_cmake import CMakeInstall
 
 class TestMethods(unittest.TestCase):
+    def test_suitable_release_found(self):
+        cmake_install = CMakeInstall(None, None)
+        self.assertFalse(cmake_install.suitable_release_found(""))
+        self.assertTrue(cmake_install.suitable_release_found(
+            "Latest Release (3.24.3)"))
+        self.assertFalse(cmake_install.suitable_release_found(
+            "Release Candidate (3.25.0-rc4)"))
+
+    def test_suitable_release_found_rc_flag(self):
+        cmake_install = CMakeInstall(None, True)
+        self.assertFalse(cmake_install.suitable_release_found(""))
+        self.assertTrue(cmake_install.suitable_release_found(
+            "Latest Release (3.24.3)"))
+        self.assertTrue(cmake_install.suitable_release_found(
+            "Release Candidate (3.25.0-rc4)"))
+
     def test_get_installed_cmake_version(self):
         cmake_install = CMakeInstall(None, None)
         self.assertEqual(cmake_install.get_installed_cmake_version(""), "")
