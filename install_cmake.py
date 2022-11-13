@@ -44,7 +44,7 @@ class CMakeInstall:
         minimum_version = "3.20.0"
         if version.parse(self.version) < version.parse(minimum_version):
             print(f"CMake {self.version} is not supported, "
-                "the version must be {minimum_version} or higher.", flush=True)
+                f"the version must be {minimum_version} or higher.", flush=True)
             print("If you'd like to make a case for broader support, please post to:",
             flush=True)
             print("https://github.com/ssrobins/install-cmake/issues", flush=True)
@@ -148,7 +148,7 @@ class CMakeInstall:
             with zipfile.ZipFile(f"{self.archive}", 'r') as cmake_zip:
                 cmake_zip.extractall(path=self.script_path)
         else:
-            print("Unsupported archive: {self.archive}", flush=True)
+            print(f"Unsupported archive: {self.archive}", flush=True)
             sys.exit(1)
         subprocess.run(os.path.join(self.path, "cmake --version"), shell=True, check=True)
 
