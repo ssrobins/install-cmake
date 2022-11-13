@@ -1,5 +1,5 @@
 # Install CMake
-This GitHub Action installs CMake so you can use the latest release or release candidate or set the specific version you have installed. CMake is already installed and regularly updated as part of the provided [runner images](https://github.com/actions/runner-images/tree/main/images) so it's most useful in the following situations:
+This [GitHub Action](https://github.com/features/actions) installs CMake so you can use the latest release or release candidate or set the specific version you have installed. CMake is already installed and regularly updated as part of the provided [runner images](https://github.com/actions/runner-images/tree/main/images) so it's most useful in the following situations:
 - You want to be on the latest CMake at all times
 - You want to stay on a specific release of CMake at all times
 - You want to use release candidates for early access to new features or to help with testing
