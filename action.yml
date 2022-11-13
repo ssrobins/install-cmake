@@ -10,9 +10,12 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Install dependencies
+      run: pip3 install -r requirements.txt
+      shell: bash
+
     - name: Install CMake
       run: |
-        pip3 install -r requirements.txt
         if [ ! -z "${{ inputs.version }}" ]; then
             input_version="--version ${{ inputs.version }}"
         fi
