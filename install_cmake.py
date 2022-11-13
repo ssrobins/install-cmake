@@ -39,7 +39,8 @@ class CMakeInstall:
                 self.version = cmake_version_raw
             else:
                 print(f"CMake version '{cmake_version_raw}' is not valid,", flush=True)
-                print(f"it must be in the form of 3.24.3 or 3.25.0-rc4 for release candidates")
+                print("it must be in the form of 3.24.3 or 3.25.0-rc4 for "
+                    "release candidates.", flush=True)
                 sys.exit(1)
         else:
             self.version = self.get_latest_cmake_version()
@@ -169,7 +170,8 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--version",
-        help="CMake version in the form of 3.24.3 or 3.25.0-rc4 for release candidates", required=False
+        help="CMake version in the form of 3.24.3 or 3.25.0-rc4 for "
+            "release candidates", required=False
     )
     parser.add_argument("--rc",
         action="store_true",
