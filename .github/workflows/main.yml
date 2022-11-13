@@ -60,3 +60,9 @@ jobs:
         with:
           version: 3.19.0
         continue-on-error: true
+
+      - name: Install CMake with bad version option
+        uses: ./
+        with:
+          version: total nonsense
+        continue-on-error: true
