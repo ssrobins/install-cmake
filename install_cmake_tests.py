@@ -40,6 +40,10 @@ class TestMethods(unittest.TestCase):
         self.assertEqual(get_cmake_version(
             "cmake version 3.19.0-rc3\n\n"
             "CMake suite maintained and supported by Kitware (kitware.com/cmake).\n"), "3.19.0-rc3")
+        self.assertEqual(get_cmake_version(
+            "'3.24.3'"), "3.24.3")
+        self.assertEqual(get_cmake_version(
+            '"3.24.3"'), "3.24.3")
 
 
 if __name__ == '__main__':

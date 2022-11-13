@@ -35,8 +35,9 @@ class CMakeInstall:
         else:
             self.release_candidate = False
         if cmake_version_raw:
-            if get_cmake_version(cmake_version_raw):
-                self.version = cmake_version_raw
+            cmake_version = get_cmake_version(cmake_version_raw)
+            if cmake_version:
+                self.version = cmake_version
             else:
                 print(f"CMake version '{cmake_version_raw}' is not valid,", flush=True)
                 print("it must be in the form of 3.24.3 or 3.25.0-rc4 for "
