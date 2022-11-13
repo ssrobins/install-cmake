@@ -50,6 +50,11 @@ jobs:
         with:
           version: 3.23.0
 
+      - name: Install CMake where version has quotes
+        uses: ./
+        with:
+          version: '3.23.0'
+
       - name: Install CMake 3.20.0 (minimum)
         uses: ./
         with:
@@ -61,7 +66,7 @@ jobs:
           version: 3.19.0
         continue-on-error: true
 
-      - name: Install CMake with bad version option
+      - name: Install CMake fails with bad version option
         uses: ./
         with:
           version: total nonsense

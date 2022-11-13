@@ -17,7 +17,7 @@ runs:
     - name: Install CMake
       run: |
         if [ ! -z "${{ inputs.version }}" ]; then
-            input_version="--version ${{ inputs.version }}"
+            input_version="--version '${{ inputs.version }}'"
         fi
         if [ "${{ inputs.release-candidate }}" = true ]; then
             input_rc=" --rc"
