@@ -17,7 +17,7 @@ Same as above, but with a custom step name:
 - name: Install CMake
   uses: ssrobins/install-cmake@v1
 ```
-Allow latest CMake install to be a release candidate, if available:
+Allow the latest CMake install to be a release candidate, if available:
 ```yaml
 - name: Install CMake
   uses: ssrobins/install-cmake@v1
@@ -51,7 +51,7 @@ I want this to be useful to the whole community so if you have an idea, please p
 ## Under-the-hood
 This GitHub Action is a [composite action](https://docs.github.com/en/actions/creating-actions/creating-a-composite-action). Here are all the parts:
 - [action.yml](action.yml) defines the inputs and steps to perform the action
-- [install_cmake.py](install_cmake.py) is the script that actually does the install
+- [install_cmake.py](install_cmake.py) is the Python script that actually does the install
 - [install_cmake_tests.py](install_cmake_tests.py) runs the unit tests for the script
 - [.github/workflows/main.yml](.github/workflows/main.yml) is the GitHub Action that runs unit tests as well as the action on several environments
 
