@@ -5,7 +5,7 @@
 # pylint: disable=missing-function-docstring
 
 import unittest
-from install_cmake import CMakeInstall, get_installed_cmake_version
+from install_cmake import CMakeInstall, get_cmake_version
 
 class TestMethods(unittest.TestCase):
     def test_suitable_release_found(self):
@@ -24,20 +24,20 @@ class TestMethods(unittest.TestCase):
         self.assertTrue(cmake_install.suitable_release_found(
             "Release Candidate (3.25.0-rc4)"))
 
-    def test_get_installed_cmake_version(self):
-        self.assertEqual(get_installed_cmake_version(""), "")
-        self.assertEqual(get_installed_cmake_version("blah"), "")
-        self.assertEqual(get_installed_cmake_version("3"), "")
-        self.assertEqual(get_installed_cmake_version("cmake version 3.18"), "")
-        self.assertEqual(get_installed_cmake_version(
+    def test_get_cmake_version(self):
+        self.assertEqual(get_cmake_version(""), "")
+        self.assertEqual(get_cmake_version("blah"), "")
+        self.assertEqual(get_cmake_version("3"), "")
+        self.assertEqual(get_cmake_version("cmake version 3.18"), "")
+        self.assertEqual(get_cmake_version(
             "cmake version 3.18.4"), "3.18.4")
-        self.assertEqual(get_installed_cmake_version(
+        self.assertEqual(get_cmake_version(
             "cmake version 3.19.0-rc3"), "3.19.0-rc3")
-        self.assertEqual(get_installed_cmake_version(
+        self.assertEqual(get_cmake_version(
             "cmake version 99.99.99"), "99.99.99")
-        self.assertEqual(get_installed_cmake_version(
+        self.assertEqual(get_cmake_version(
             "cmake version 99.99.99-rc99"), "99.99.99-rc99")
-        self.assertEqual(get_installed_cmake_version(
+        self.assertEqual(get_cmake_version(
             "cmake version 3.19.0-rc3\n\n"
             "CMake suite maintained and supported by Kitware (kitware.com/cmake).\n"), "3.19.0-rc3")
 
