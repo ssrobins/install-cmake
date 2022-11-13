@@ -24,7 +24,7 @@ Allow the latest CMake install to be a release candidate, if available:
   with:
     release-candidate: true
 ```
-Use `version` to specify a particular version of CMake in the form of `3.24.3` or `3.25.0-rc4` for RCs. NOTE: Currently, only `3.20.0` or higher are supported, but that can be changed if there's a need for it.
+Use `version` to specify a particular version of CMake in the form of `3.24.3` or `3.25.0-rc4` for release candidates. NOTE: Currently, only `3.20.0` or higher are supported, but that can be changed if there's a need for it.
 ```yaml
 - name: Install CMake
   uses: ssrobins/install-cmake@v1

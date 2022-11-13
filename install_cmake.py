@@ -20,7 +20,7 @@ from urllib3.util import Retry
 import requests
 
 
-def get_installed_cmake_version(cmake_version_output):
+def get_cmake_version(cmake_version_output):
     cmake_version = ""
     match = re.search(r"\d+\.\d+\.\d+(\-rc\d+)?", cmake_version_output)
     if match:
@@ -29,13 +29,18 @@ def get_installed_cmake_version(cmake_version_output):
 
 
 class CMakeInstall:
-    def __init__(self, cmake_version, release_candidate):
+    def __init__(self, cmake_version_raw, release_candidate):
         if release_candidate:
             self.release_candidate = True
         else:
             self.release_candidate = False
-        if cmake_version:
-            self.version = cmake_version
+        if cmake_version_raw:
+            if get_cmake_version(cmake_version_raw):
+                self.version = cmake_version_raw
+            else:
+                print(f"CMake version '{cmake_version_raw}' is not valid,", flush=True)
+                print(f"it must be in the form of 3.24.3 or 3.25.0-rc4 for release candidates")
+                sys.exit(1)
         else:
             self.version = self.get_latest_cmake_version()
 
@@ -43,7 +48,7 @@ class CMakeInstall:
 
         minimum_version = "3.20.0"
         if version.parse(self.version) < version.parse(minimum_version):
-            print(f"CMake {self.version} is not supported, "
+            print(f"CMake version '{self.version}' is not supported, "
                 f"the version must be {minimum_version} or higher.", flush=True)
             print("If you'd like to make a case for broader support, please post to:",
             flush=True)
@@ -102,7 +107,7 @@ class CMakeInstall:
         cmake_version_output = subprocess.run(
             "cmake --version", shell=True, check=True, stdout=subprocess.PIPE)
         cmake_version_output = cmake_version_output.stdout.decode("utf-8")
-        installed_cmake_version = get_installed_cmake_version(cmake_version_output)
+        installed_cmake_version = get_cmake_version(cmake_version_output)
         if installed_cmake_version == self.version:
             print(f"Requested CMake {self.version} matches what's already installed", flush=True)
             return False
@@ -164,7 +169,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--version",
-        help="CMake version in the form 3.24.3 or 3.25.0-rc4 for RCs", required=False
+        help="CMake version in the form of 3.24.3 or 3.25.0-rc4 for release candidates", required=False
     )
     parser.add_argument("--rc",
         action="store_true",

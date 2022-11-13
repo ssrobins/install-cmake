@@ -1,7 +1,7 @@
 name: 'Install CMake'
 inputs:
   version:
-    description: 'CMake version in the form 3.24.3 or 3.25.0-rc4 for RCs'
+    description: 'CMake version in the form of 3.24.3 or 3.25.0-rc4 for release candidates'
     required: false
   release-candidate:
     description: 'Consider a release candidate when selecting the latest version'
