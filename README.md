@@ -53,7 +53,7 @@ This GitHub Action is a [composite action](https://docs.github.com/en/actions/cr
 - [action.yml](action.yml) defines the inputs and steps to perform the action
 - [install_cmake.py](install_cmake.py) is the Python script that actually does the install
 - [install_cmake_tests.py](install_cmake_tests.py) runs the unit tests for the script
-- [.github/workflows/main.yml](.github/workflows/main.yml) is the GitHub Action that runs unit tests as well as the action on several environments
+- [.github/workflows/main.yml](.github/workflows/main.yml) is the GitHub Action that runs unit tests as well running a local copy of the `install-cmake` action on several environments
 
 The CMake install itself is simply a download and extraction of the tar/zip archives into the GitHub Actions workspace so it's only present in that particular actions run and won't affect any existing CMake installations on the machine. In order for the `cmake` command to use this local install, it outputs the path to the `$GITHUB_PATH` environment file so it will ultimately be added to environment's `PATH` environment variable. More info in the [GitHub documentation](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#adding-a-system-path).
 
