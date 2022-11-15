@@ -1,4 +1,5 @@
-name: 'Install CMake'
+name: 'Install Latest CMake'
+description: 'Install CMake so you can use the latest release, latest release candidate, or a specific version'
 inputs:
   version:
     description: 'CMake version in the form of 3.24.3 or 3.25.0-rc4 for release candidates'
