@@ -59,7 +59,7 @@ The CMake install itself is simply a download and extraction of the platform-spe
 
 The determination of the latest release and release candidate is done with a web scraping of https://cmake.org/download/. Then, it's downloaded from https://github.com/Kitware/CMake/releases using the established naming pattern that's been around since `3.20.0`. This is why the current minimum supported version is set to that (for now, at least).
 
-If either cmake.org or GitHub go down or the install archive pattern changes, this action will break. Using `continue-on-error: true` in the action mitigates the impact, as long as the runner has an existing CMake installation that'll work with your build.
+If either cmake.org goes down or the install archive pattern changes, this action will break. Using `continue-on-error: true` in the action mitigates the impact, as long as the runner has an existing CMake installation that'll work with your build.
 
 ## Inside scoop
 I've actually been using this action unpublished in [a](https://github.com/ssrobins/stackblox/blob/main/.github/workflows/main.yml) [few](https://github.com/ssrobins/sdl2-example/blob/main/.github/workflows/main.yml) [repos](https://github.com/ssrobins/sfml-examples/blob/main/.github/workflows/main.yml) to install the CMake release candidate for a few years now. One day, my GitHub Actions checks broke on the first CMake 3.25 release candidate, which led me to [log a bug](https://gitlab.kitware.com/cmake/cmake/-/issues/24087) that ended up getting fixed. After that, I realized this could be a useful action for the awesome CMake community that I should publish to the marketplace so others can discover it.
