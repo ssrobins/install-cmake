@@ -149,8 +149,8 @@ class CMakeInstall:
     def extract(self):
         print(f"Extracting {self.archive} to {self.script_path}", flush=True)
         if "tar" in self.archive:
-            with tarfile.open(f"{self.archive}", "r:gz") as tar:
-                tar.extractall(path=self.script_path)
+            with tarfile.open(f"{self.archive}", "r:gz") as cmake_tar:
+                cmake_tar.extractall(path=self.script_path)
         elif "zip" in self.archive:
             with zipfile.ZipFile(f"{self.archive}", 'r') as cmake_zip:
                 cmake_zip.extractall(path=self.script_path)

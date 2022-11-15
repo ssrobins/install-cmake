@@ -6,7 +6,7 @@ This [GitHub Action](https://github.com/features/actions) installs CMake so you 
 - You maintain your own runner and you want a way to install CMake
 
 ## Usage
-Available inputs are descriibed [here](action.yml).
+Available inputs are described [here](action.yml).
 
 Install the latest version of CMake with one line:
 ```yaml
@@ -37,7 +37,7 @@ Add `continue-on-error: true` if you don't want a failure of CMake installation 
   uses: ssrobins/install-cmake@v1
   continue-on-error: true
 ```
-To always have the latest code from this action and are ok with the possibily of API breaks, set the version to `main`:
+To always have the latest code from this action and are ok with the possibility of API breaks, set the version to `main`:
 ```yaml
 - uses: ssrobins/install-cmake@main
 ```
