@@ -8,12 +8,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  builds:
+  run:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-22.04, ubuntu-20.04, ubuntu-18.04, windows-2022, windows-2019, macos-12, macos-11, macos-10.15]
     steps:
       - uses: actions/checkout@v3
 
@@ -23,8 +23,16 @@ jobs:
       - name: Python version
         run: python3 --version
 
-      - name: Install Python requirements
-        run: pip3 install BeautifulSoup4 packaging requests
+      - name: Install dependencies
+        run: pip3 install -r requirements.txt
+
+      - name: Add Python bin to PATH
+        run: echo "/Library/Frameworks/Python.framework/Versions/Current/bin" >> $GITHUB_PATH
+
+      - name: Run pylint
+        run: |
+          pip3 install pylint
+          pylint install_cmake.py install_cmake_tests.py
 
       - name: Run unit tests
         run: python3 install_cmake_tests.py
@@ -42,6 +50,11 @@ jobs:
         with:
           version: 3.23.0
 
+      - name: Install CMake where version has quotes
+        uses: ./
+        with:
+          version: '3.23.0'
+
       - name: Install CMake 3.20.0 (minimum)
         uses: ./
         with:
@@ -51,4 +64,10 @@ jobs:
         uses: ./
         with:
           version: 3.19.0
+        continue-on-error: true
+
+      - name: Install CMake fails with bad version option
+        uses: ./
+        with:
+          version: nonsense
         continue-on-error: true
