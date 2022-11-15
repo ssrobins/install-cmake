@@ -43,7 +43,7 @@ To always have the latest code from this action and are ok with the possibility 
 ```
 
 ## Contributing
-I want this to be useful to the whole community so if you have an idea, please post an [issue](https://github.com/ssrobins/install-cmake/issues) or a [pull request](https://github.com/ssrobins/install-cmake/pulls). I'll do my best respond in a few days. All I ask for is the following:
+I want this to be useful to the whole community so if you have an idea, please post an [issue](https://github.com/ssrobins/install-cmake/issues) or a [pull request](https://github.com/ssrobins/install-cmake/pulls). I'll do my best to respond in a few days. All I ask for is the following:
 - Clearly articulate the goal of a change
 - Make sure PR checks pass
 - Be nice!
