@@ -69,5 +69,5 @@ jobs:
       - name: Install CMake fails with bad version option
         uses: ./
         with:
-          version: total nonsense
+          version: nonsense
         continue-on-error: true
