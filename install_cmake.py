@@ -150,7 +150,26 @@ class CMakeInstall:
         print(f"Extracting {self.archive} to {self.script_path}", flush=True)
         if "tar" in self.archive:
             with tarfile.open(f"{self.archive}", "r:gz") as cmake_tar:
-                cmake_tar.extractall(path=self.script_path)
+                def is_within_directory(directory, target):
+                    
+                    abs_directory = os.path.abspath(directory)
+                    abs_target = os.path.abspath(target)
+                
+                    prefix = os.path.commonprefix([abs_directory, abs_target])
+                    
+                    return prefix == abs_directory
+                
+                def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+                
+                    for member in tar.getmembers():
+                        member_path = os.path.join(path, member.name)
+                        if not is_within_directory(path, member_path):
+                            raise Exception("Attempted Path Traversal in Tar File")
+                
+                    tar.extractall(path, members, numeric_owner) 
+                    
+                
+                safe_extract(cmake_tar, path=self.script_path)
         elif "zip" in self.archive:
             with zipfile.ZipFile(f"{self.archive}", 'r') as cmake_zip:
                 cmake_zip.extractall(path=self.script_path)
