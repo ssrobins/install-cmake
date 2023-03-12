@@ -9,6 +9,7 @@ on:
 
 jobs:
   run:
+    name: check
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
