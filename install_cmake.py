@@ -93,15 +93,10 @@ class CMakeInstall:
         with urlopen(req) as response:
             page = response.read().decode('utf8', errors='ignore')
             soup = BeautifulSoup(page, "html.parser")
-            h3_tag_contents = soup.findAll("h3")
 
-        version_text_raw = None
-        for h3_tag_content in h3_tag_contents:
-            if self.suitable_release_found(h3_tag_content.text):
-                version_text_raw = h3_tag_content.text
-                break
+        version_items = soup.find("h2", attrs={"id": "latest"}).text.strip().split()
 
-        cmake_version = version_text_raw.split()[2].strip("()")
+        cmake_version = version_items[2].strip("()")
         return cmake_version
 
 
