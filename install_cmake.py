@@ -69,6 +69,8 @@ class CMakeInstall:
             cmake_platform = "windows-x86_64"
             cmake_archive_ext = ".zip"
             cmake_binary_dir = "bin"
+        else:
+            raise RuntimeError(f"Unsupported platform: {platform.system()}")
 
         cmake_dir = f"cmake-{self.version}-{cmake_platform}"
         self.archive = f"{cmake_dir}{cmake_archive_ext}"
