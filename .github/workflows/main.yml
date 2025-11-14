@@ -53,7 +53,8 @@ jobs:
           "$VENV_PY" -m pylint install_cmake.py install_cmake_tests.py
 
       - name: Run unit tests
-        run: "$VENV_PY" install_cmake_tests.py
+        shell: bash
+        run: $VENV_PY install_cmake_tests.py
 
       - name: Install CMake (default)
         uses: ./
