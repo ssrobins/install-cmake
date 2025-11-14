@@ -11,9 +11,19 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install dependencies
-      run: pip3 install -r $GITHUB_ACTION_PATH/requirements.txt
+    - name: Setup Python venv and install deps
       shell: bash
+      run: |
+        # Create a temporary virtual environment to avoid PEP 668 restrictions
+        python3 -m venv "$RUNNER_TEMP/instcmake_venv"
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          echo "$RUNNER_TEMP/instcmake_venv/Scripts" >> "$GITHUB_PATH"
+        else
+          echo "$RUNNER_TEMP/instcmake_venv/bin" >> "$GITHUB_PATH"
+        fi
+        # Upgrade pip inside the venv and install requirements
+        python -m pip install --upgrade pip
+        python -m pip install -r "$GITHUB_ACTION_PATH/requirements.txt"
 
     - name: Install CMake
       run: |
@@ -24,5 +34,5 @@ runs:
             input_rc="--rc"
         fi
         echo
-        python3 $GITHUB_ACTION_PATH/install_cmake.py $input_version $input_rc
+        python "$GITHUB_ACTION_PATH/install_cmake.py" $input_version $input_rc
       shell: bash

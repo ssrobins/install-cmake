@@ -33,16 +33,26 @@ jobs:
       - name: Python version
         run: python3 --version
 
-      - name: Install dependencies
-        run: pip3 install --break-system-packages -r requirements.txt
+      - name: Setup Python venv and install deps
+        shell: bash
+        run: |
+          python3 -m venv "$RUNNER_TEMP/instcmake_venv"
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "$RUNNER_TEMP/instcmake_venv/Scripts" >> "$GITHUB_PATH"
+          else
+            echo "$RUNNER_TEMP/instcmake_venv/bin" >> "$GITHUB_PATH"
+          fi
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Run pylint
+        shell: bash
         run: |
-          pip3 install --break-system-packages pylint
+          python -m pip install pylint
           pylint install_cmake.py install_cmake_tests.py
 
       - name: Run unit tests
-        run: python3 install_cmake_tests.py
+        run: python install_cmake_tests.py
 
       - name: Install CMake (default)
         uses: ./
