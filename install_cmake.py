@@ -199,16 +199,18 @@ class CMakeInstall:
                                 f"Path traversal detected in tar member: {name}"
                             )
 
-                        # Disallow links that escape base directory or use absolute targets
+                        # Disallow links that escape base directory
+                        # or use absolute or drive-relative targets
                         if member.issym() or member.islnk():
                             link_target = member.linkname or ""
-                            # Reject absolute link targets
+                            # Reject absolute and drive-relative link targets
                             if (os.path.isabs(link_target)
                                     or re.match(r"^[A-Za-z]:", link_target)):
-                                raise TarExtractionError(
-                                    f"Absolute link target not allowed: "
-                                    f"{name} -> {link_target}"
+                                msg = (
+                                    "Absolute or drive-relative link target not allowed: "
+                                    + str(name) + " -> " + str(link_target)
                                 )
+                                raise TarExtractionError(msg)
                             # Resolve relative link target against the member's directory
                             link_target = os.path.abspath(
                                 os.path.join(
@@ -217,10 +219,13 @@ class CMakeInstall:
                                 )
                             )
                             if not _is_within(base, link_target):
-                                raise TarExtractionError(
-                                    f"Link target escapes extraction directory: "
-                                    f"{name} -> {member.linkname}"
+                                msg = (
+                                    "Link target escapes extraction directory: "
+                                    + str(name)
+                                    + " -> "
+                                    + str(member.linkname)
                                 )
+                                raise TarExtractionError(msg)
 
                     members = cmake_tar.getmembers()
                     for m in members:
