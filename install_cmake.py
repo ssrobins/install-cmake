@@ -20,6 +20,11 @@ from urllib3.util import Retry
 import requests
 
 
+class TarExtractionError(Exception):
+    """Specific error for unsafe tar archive contents."""
+    pass
+
+
 def get_cmake_version(cmake_version_output):
     cmake_version = ""
     match = re.search(r"\d+\.\d+\.\d+(\-rc\d+)?", cmake_version_output)
@@ -184,22 +189,32 @@ class CMakeInstall:
                     name = member.name
                     # Disallow absolute paths and Windows drive-absolute paths
                     if os.path.isabs(name) or re.match(r"^[A-Za-z]:\\", name):
-                        raise Exception("Absolute path in tar member")
+                        raise TarExtractionError("Absolute path in tar member")
 
-                    member_path = os.path.abspath(os.path.join(base, name))
+                    member_path = os.path.abspath(
+                        os.path.join(base, name)
+                    )
                     if not _is_within(base, member_path):
-                        raise Exception("Path traversal in tar member")
+                        raise TarExtractionError("Path traversal in tar member")
 
                     # Disallow links that escape base directory
                     if member.issym() or member.islnk():
                         link_target = member.linkname or ""
                         # Resolve relative link target against the member's directory
-                        if not os.path.isabs(link_target) and not re.match(r"^[A-Za-z]:\\", link_target):
-                            link_target = os.path.abspath(os.path.join(os.path.dirname(member_path), link_target))
+                        if (not os.path.isabs(link_target)
+                                and not re.match(r"^[A-Za-z]:\\", link_target)):
+                            link_target = os.path.abspath(
+                                os.path.join(
+                                    os.path.dirname(member_path),
+                                    link_target
+                                )
+                            )
                         else:
                             link_target = os.path.abspath(link_target)
                         if not _is_within(base, link_target):
-                            raise Exception("Link target escapes extraction directory")
+                            raise TarExtractionError(
+                                "Link target escapes extraction directory"
+                            )
 
                 members = cmake_tar.getmembers()
                 for m in members:
