@@ -174,51 +174,62 @@ class CMakeInstall:
     def extract(self):
         print(f"Extracting {self.archive} to {self.script_path}", flush=True)
         if "tar" in self.archive:
-            with tarfile.open(f"{self.archive}", "r:gz") as cmake_tar:
-                base = os.path.abspath(self.script_path)
+            try:
+                with tarfile.open(f"{self.archive}", "r:gz") as cmake_tar:
+                    base = os.path.abspath(self.script_path)
 
-                def _is_within(base_dir, target_path):
-                    try:
-                        return os.path.commonpath([base_dir, target_path]) == base_dir
-                    except ValueError:
-                        # Raised if paths are on different drives on Windows
-                        return False
+                    def _is_within(base_dir, target_path):
+                        try:
+                            return os.path.commonpath([base_dir, target_path]) == base_dir
+                        except ValueError:
+                            # Raised if paths are on different drives on Windows
+                            return False
 
-                def _validate_member(member: tarfile.TarInfo):
-                    name = member.name
-                    # Disallow absolute paths and Windows drive-absolute paths
-                    if os.path.isabs(name) or re.match(r"^[A-Za-z]:\\", name):
-                        raise TarExtractionError("Absolute path in tar member")
+                    def _validate_member(member: tarfile.TarInfo):
+                        name = member.name
+                        # Disallow absolute paths and Windows drive-absolute paths
+                        if os.path.isabs(name) or re.match(r"^[A-Za-z]:[\\/]", name):
+                            raise TarExtractionError(f"Absolute path in tar member: {name}")
 
-                    member_path = os.path.abspath(
-                        os.path.join(base, name)
-                    )
-                    if not _is_within(base, member_path):
-                        raise TarExtractionError("Path traversal in tar member")
+                        member_path = os.path.abspath(
+                            os.path.join(base, name)
+                        )
+                        if not _is_within(base, member_path):
+                            raise TarExtractionError(
+                                f"Path traversal detected in tar member: {name}"
+                            )
 
-                    # Disallow links that escape base directory
-                    if member.issym() or member.islnk():
-                        link_target = member.linkname or ""
-                        # Resolve relative link target against the member's directory
-                        if (not os.path.isabs(link_target)
-                                and not re.match(r"^[A-Za-z]:\\", link_target)):
+                        # Disallow links that escape base directory or use absolute targets
+                        if member.issym() or member.islnk():
+                            link_target = member.linkname or ""
+                            # Reject absolute link targets
+                            if (os.path.isabs(link_target)
+                                    or re.match(r"^[A-Za-z]:[\\/]", link_target)):
+                                raise TarExtractionError(
+                                    f"Absolute link target not allowed: "
+                                    f"{name} -> {link_target}"
+                                )
+                            # Resolve relative link target against the member's directory
                             link_target = os.path.abspath(
                                 os.path.join(
                                     os.path.dirname(member_path),
                                     link_target
                                 )
                             )
-                        else:
-                            link_target = os.path.abspath(link_target)
-                        if not _is_within(base, link_target):
-                            raise TarExtractionError(
-                                "Link target escapes extraction directory"
-                            )
+                            if not _is_within(base, link_target):
+                                raise TarExtractionError(
+                                    f"Link target escapes extraction directory: "
+                                    f"{name} -> {member.linkname}"
+                                )
 
-                members = cmake_tar.getmembers()
-                for m in members:
-                    _validate_member(m)
-                cmake_tar.extractall(path=base, members=members)
+                    members = cmake_tar.getmembers()
+                    for m in members:
+                        _validate_member(m)
+                    cmake_tar.extractall(path=base, members=members)
+            except TarExtractionError as e:
+                print(f"Security error extracting tar archive: {e}", flush=True)
+                print("The archive contains unsafe paths or links.", flush=True)
+                sys.exit(1)
         elif "zip" in self.archive:
             with zipfile.ZipFile(f"{self.archive}", 'r') as cmake_zip:
                 cmake_zip.extractall(path=self.script_path)
