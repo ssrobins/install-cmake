@@ -22,7 +22,6 @@ import requests
 
 class TarExtractionError(Exception):
     """Specific error for unsafe tar archive contents."""
-    pass
 
 
 def get_cmake_version(cmake_version_output):
