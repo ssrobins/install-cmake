@@ -14,20 +14,25 @@ runs:
     - name: Setup Python venv and install deps
       shell: bash
       run: |
-        # Create a temporary virtual environment to avoid PEP 668 restrictions
-        python3 -m venv "$RUNNER_TEMP/instcmake_venv"
-        if [[ "$RUNNER_OS" == "Windows" ]]; then
-          VENV_PY="$RUNNER_TEMP/instcmake_venv/Scripts/python.exe"
-          echo "$RUNNER_TEMP/instcmake_venv/Scripts" >> "$GITHUB_PATH"
+        # Reuse venv from workflow if provided; otherwise create a new one
+        if [[ -n "$VENV_PY" ]] && [[ -x "$VENV_PY" ]]; then
+          echo "Using existing venv: $VENV_PY"
         else
-          VENV_PY="$RUNNER_TEMP/instcmake_venv/bin/python"
-          echo "$RUNNER_TEMP/instcmake_venv/bin" >> "$GITHUB_PATH"
+          python3 -m venv "$RUNNER_TEMP/instcmake_venv"
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            VENV_PY="$RUNNER_TEMP/instcmake_venv/Scripts/python.exe"
+            echo "$RUNNER_TEMP/instcmake_venv/Scripts" >> "$GITHUB_PATH"
+          else
+            VENV_PY="$RUNNER_TEMP/instcmake_venv/bin/python"
+            echo "$RUNNER_TEMP/instcmake_venv/bin" >> "$GITHUB_PATH"
+          fi
+          echo "VENV_PY=$VENV_PY" >> "$GITHUB_ENV"
+          "$VENV_PY" -m pip install --upgrade pip
         fi
-        echo "VENV_PY=$VENV_PY" >> "$GITHUB_ENV"
-        "$VENV_PY" -m pip install --upgrade pip
         "$VENV_PY" -m pip install -r "$GITHUB_ACTION_PATH/requirements.txt"
 
     - name: Install CMake
+      shell: bash
       run: |
         if [ ! -z "${{ inputs.version }}" ]; then
             input_version="--version ${{ inputs.version }}"
@@ -35,6 +40,4 @@ runs:
         if [ "${{ inputs.release-candidate }}" = true ]; then
             input_rc="--rc"
         fi
-        echo
         "$VENV_PY" "$GITHUB_ACTION_PATH/install_cmake.py" $input_version $input_rc
-      shell: bash
