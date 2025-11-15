@@ -204,7 +204,7 @@ class CMakeInstall:
                             link_target = member.linkname or ""
                             # Reject absolute link targets
                             if (os.path.isabs(link_target)
-                                    or re.match(r"^[A-Za-z]:[\\/]", link_target)):
+                                    or re.match(r"^[A-Za-z]:", link_target)):
                                 raise TarExtractionError(
                                     f"Absolute link target not allowed: "
                                     f"{name} -> {link_target}"
