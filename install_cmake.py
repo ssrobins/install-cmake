@@ -20,6 +20,10 @@ from urllib3.util import Retry
 import requests
 
 
+class TarExtractionError(Exception):
+    """Specific error for unsafe tar archive contents."""
+
+
 def get_cmake_version(cmake_version_output):
     cmake_version = ""
     match = re.search(r"\d+\.\d+\.\d+(\-rc\d+)?", cmake_version_output)
@@ -170,8 +174,67 @@ class CMakeInstall:
     def extract(self):
         print(f"Extracting {self.archive} to {self.script_path}", flush=True)
         if "tar" in self.archive:
-            with tarfile.open(f"{self.archive}", "r:gz") as cmake_tar:
-                cmake_tar.extractall(path=self.script_path)
+            try:
+                with tarfile.open(f"{self.archive}", "r:gz") as cmake_tar:
+                    base = os.path.abspath(self.script_path)
+
+                    def _is_within(base_dir, target_path):
+                        try:
+                            return os.path.commonpath([base_dir, target_path]) == base_dir
+                        except ValueError:
+                            # Raised if paths are on different drives on Windows
+                            return False
+
+                    def _validate_member(member: tarfile.TarInfo):
+                        name = member.name
+                        # Disallow absolute paths and Windows drive-absolute paths
+                        if os.path.isabs(name) or re.match(r"^[A-Za-z]:[\\/]", name):
+                            raise TarExtractionError(f"Absolute path in tar member: {name}")
+
+                        member_path = os.path.abspath(
+                            os.path.join(base, name)
+                        )
+                        if not _is_within(base, member_path):
+                            raise TarExtractionError(
+                                f"Path traversal detected in tar member: {name}"
+                            )
+
+                        # Disallow links that escape base directory
+                        # or use absolute or drive-relative targets
+                        if member.issym() or member.islnk():
+                            link_target = member.linkname or ""
+                            # Reject absolute and drive-relative link targets
+                            if (os.path.isabs(link_target)
+                                    or re.match(r"^[A-Za-z]:", link_target)):
+                                msg = (
+                                    "Absolute or drive-relative link target not allowed: "
+                                    + str(name) + " -> " + str(link_target)
+                                )
+                                raise TarExtractionError(msg)
+                            # Resolve relative link target against the member's directory
+                            link_target = os.path.abspath(
+                                os.path.join(
+                                    os.path.dirname(member_path),
+                                    link_target
+                                )
+                            )
+                            if not _is_within(base, link_target):
+                                msg = (
+                                    "Link target escapes extraction directory: "
+                                    + str(name)
+                                    + " -> "
+                                    + str(member.linkname)
+                                )
+                                raise TarExtractionError(msg)
+
+                    members = cmake_tar.getmembers()
+                    for m in members:
+                        _validate_member(m)
+                    cmake_tar.extractall(path=base, members=members)
+            except TarExtractionError as e:
+                print(f"Security error extracting tar archive: {e}", flush=True)
+                print("The archive contains unsafe paths or links.", flush=True)
+                sys.exit(1)
         elif "zip" in self.archive:
             with zipfile.ZipFile(f"{self.archive}", 'r') as cmake_zip:
                 cmake_zip.extractall(path=self.script_path)
