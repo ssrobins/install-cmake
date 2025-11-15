@@ -13,7 +13,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-20.04, windows-2022, windows-2019, macos-12, macos-11, macos-10.15]
+        os: [
+          macos-14,
+          macos-15,
+          macos-26,
+          ubuntu-22.04,
+          ubuntu-24.04,
+          windows-2022,
+          windows-2025
+        ]
     steps:
       - uses: actions/checkout@v3
 
@@ -23,16 +31,30 @@ jobs:
       - name: Python version
         run: python3 --version
 
-      - name: Install dependencies
-        run: pip3 install -r requirements.txt
+      - name: Setup Python venv and install deps
+        shell: bash
+        run: |
+          python3 -m venv "$RUNNER_TEMP/instcmake_venv"
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            VENV_PY="$RUNNER_TEMP/instcmake_venv/Scripts/python.exe"
+            echo "$RUNNER_TEMP/instcmake_venv/Scripts" >> "$GITHUB_PATH"
+          else
+            VENV_PY="$RUNNER_TEMP/instcmake_venv/bin/python"
+            echo "$RUNNER_TEMP/instcmake_venv/bin" >> "$GITHUB_PATH"
+          fi
+          echo "VENV_PY=$VENV_PY" >> "$GITHUB_ENV"
+          "$VENV_PY" -m pip install --upgrade pip
+          "$VENV_PY" -m pip install -r requirements.txt
 
       - name: Run pylint
+        shell: bash
         run: |
-          pip3 install pylint
-          pylint install_cmake.py install_cmake_tests.py
+          "$VENV_PY" -m pip install pylint
+          "$VENV_PY" -m pylint install_cmake.py install_cmake_tests.py
 
       - name: Run unit tests
-        run: python3 install_cmake_tests.py
+        shell: bash
+        run: $VENV_PY install_cmake_tests.py
 
       - name: Install CMake (default)
         uses: ./

@@ -49,7 +49,11 @@ class CMakeInstall:
         self.cmake_url = "https://github.com/Kitware/CMake/releases"
 
         minimum_version = "3.20.0"
-        if version.parse(self.version) < version.parse(minimum_version):
+        # packaging.version doesn't accept the hyphen form for rc (e.g., 3.25.0-rc1),
+        # so normalize to PEP 440 style just for the comparison.
+        def _norm(v):
+            return v.replace("-rc", "rc") if v else v
+        if version.parse(_norm(self.version)) < version.parse(minimum_version):
             print(f"CMake version '{self.version}' is not supported, "
                 f"the version must be {minimum_version} or higher.", flush=True)
             print("If you'd like to make a case for broader support, please post to:",
@@ -69,6 +73,8 @@ class CMakeInstall:
             cmake_platform = "windows-x86_64"
             cmake_archive_ext = ".zip"
             cmake_binary_dir = "bin"
+        else:
+            raise RuntimeError(f"Unsupported platform: {platform.system()}")
 
         cmake_dir = f"cmake-{self.version}-{cmake_platform}"
         self.archive = f"{cmake_dir}{cmake_archive_ext}"
@@ -94,10 +100,30 @@ class CMakeInstall:
             page = response.read().decode('utf8', errors='ignore')
             soup = BeautifulSoup(page, "html.parser")
 
-        version_items = soup.find("h2", attrs={"id": "latest"}).text.strip().split()
-
-        cmake_version = version_items[2].strip("()")
-        return cmake_version
+        # Try to select the latest release candidate when requested
+        if self.release_candidate:
+            # Look for an <h2> that mentions "Release Candidate" and extract the version
+            for h2 in soup.find_all("h2"):
+                text = h2.get_text(strip=True)
+                if "Release Candidate" in text:
+                    match = re.search(r"(\d+\.\d+\.\d+(?:-rc\d+)?)", text)
+                    if match:
+                        return match.group(1)
+            # Fallback: scan entire page for rc versions and pick the highest
+            rc_versions = set(re.findall(r"\b(\d+\.\d+\.\d+-rc\d+)\b", page))
+            if rc_versions:
+                def rc_key(v):
+                    m = re.match(r"(\d+)\.(\d+)\.(\d+)-rc(\d+)", v)
+                    return tuple(int(x) for x in m.groups()) if m else (0, 0, 0, 0)
+                return sorted(rc_versions, key=rc_key, reverse=True)[0]
+        # Fallback to the latest stable release
+        latest_h2 = soup.find("h2", attrs={"id": "latest"})
+        if latest_h2:
+            match = re.search(r"(\d+\.\d+\.\d+)", latest_h2.get_text(strip=True))
+            if match:
+                return match.group(1)
+        # As a last resort, return empty string which will cause a validation error upstream
+        return ""
 
 
     def requested_cmake_is_different(self):

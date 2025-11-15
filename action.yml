@@ -11,11 +11,28 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install dependencies
-      run: pip3 install -r $GITHUB_ACTION_PATH/requirements.txt
+    - name: Setup Python venv and install deps
       shell: bash
+      run: |
+        # Reuse venv from workflow if provided; otherwise create a new one
+        if [[ -n "$VENV_PY" ]] && [[ -x "$VENV_PY" ]]; then
+          echo "Using existing venv: $VENV_PY"
+        else
+          python3 -m venv "$RUNNER_TEMP/instcmake_venv"
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            VENV_PY="$RUNNER_TEMP/instcmake_venv/Scripts/python.exe"
+            echo "$RUNNER_TEMP/instcmake_venv/Scripts" >> "$GITHUB_PATH"
+          else
+            VENV_PY="$RUNNER_TEMP/instcmake_venv/bin/python"
+            echo "$RUNNER_TEMP/instcmake_venv/bin" >> "$GITHUB_PATH"
+          fi
+          echo "VENV_PY=$VENV_PY" >> "$GITHUB_ENV"
+          "$VENV_PY" -m pip install --upgrade pip
+        fi
+        "$VENV_PY" -m pip install -r "$GITHUB_ACTION_PATH/requirements.txt"
 
     - name: Install CMake
+      shell: bash
       run: |
         if [ ! -z "${{ inputs.version }}" ]; then
             input_version="--version ${{ inputs.version }}"
@@ -23,6 +40,4 @@ runs:
         if [ "${{ inputs.release-candidate }}" = true ]; then
             input_rc="--rc"
         fi
-        echo
-        python3 $GITHUB_ACTION_PATH/install_cmake.py $input_version $input_rc
-      shell: bash
+        "$VENV_PY" "$GITHUB_ACTION_PATH/install_cmake.py" $input_version $input_rc
