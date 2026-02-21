@@ -65,20 +65,38 @@ class CMakeInstall:
             print("https://github.com/ssrobins/install-cmake/issues", flush=True)
             sys.exit(1)
 
-        if platform.system() == "Darwin":
+        system = platform.system()
+        machine = (platform.machine() or "").lower()
+        if system == "Darwin":
             cmake_platform = "macos-universal"
             cmake_archive_ext = ".tar.gz"
             cmake_binary_dir = "CMake.app/Contents/bin"
-        elif platform.system() == "Linux":
-            cmake_platform = "linux-x86_64"
+        elif system == "Linux":
+            if machine in {"x86_64", "amd64"}:
+                arch = "x86_64"
+            elif machine in {"aarch64", "arm64"}:
+                arch = "aarch64"
+            else:
+                raise RuntimeError(
+                    f"Unsupported Linux architecture: {platform.machine()}"
+                )
+            cmake_platform = f"linux-{arch}"
             cmake_archive_ext = ".tar.gz"
             cmake_binary_dir = "bin"
-        elif platform.system() == "Windows":
-            cmake_platform = "windows-x86_64"
+        elif system == "Windows":
+            if machine in {"x86_64", "amd64"}:
+                arch = "x86_64"
+            elif machine in {"arm64", "aarch64"}:
+                arch = "arm64"
+            else:
+                raise RuntimeError(
+                    f"Unsupported Windows architecture: {platform.machine()}"
+                )
+            cmake_platform = f"windows-{arch}"
             cmake_archive_ext = ".zip"
             cmake_binary_dir = "bin"
         else:
-            raise RuntimeError(f"Unsupported platform: {platform.system()}")
+            raise RuntimeError(f"Unsupported platform: {system}")
 
         cmake_dir = f"cmake-{self.version}-{cmake_platform}"
         self.archive = f"{cmake_dir}{cmake_archive_ext}"
