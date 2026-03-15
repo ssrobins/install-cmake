@@ -261,6 +261,12 @@ class CMakeInstall:
             sys.exit(1)
         subprocess.run(os.path.join(self.path, "cmake --version"), shell=True, check=True)
 
+        try:
+            if os.path.exists(self.archive):
+                os.remove(self.archive)
+        except OSError:
+            pass
+
 
     def set_path(self):
         if "GITHUB_PATH" in os.environ:
