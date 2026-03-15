@@ -75,6 +75,18 @@ class TestMethods(unittest.TestCase):
             result = get_cmake_platform()
         self.assertEqual(result, ("windows-arm64", ".zip", "bin"))
 
+    def test_cmake_install_windows_arm_requires_324(self):
+        with patch("platform.system", return_value="Windows"), \
+             patch("platform.machine", return_value="ARM64"):
+            with self.assertRaises(SystemExit):
+                CMakeInstall("3.23.0", None)
+
+    def test_cmake_install_windows_arm_allows_324(self):
+        with patch("platform.system", return_value="Windows"), \
+             patch("platform.machine", return_value="ARM64"):
+            cmake_install = CMakeInstall("3.24.0", None)
+        self.assertEqual(cmake_install.version, "3.24.0")
+
     def test_get_cmake_platform_unsupported_arch(self):
         with patch("platform.system", return_value="Linux"), \
              patch("platform.machine", return_value="riscv64"):

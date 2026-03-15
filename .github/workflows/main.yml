@@ -67,19 +67,29 @@ jobs:
           release-candidate: true
 
       - name: Install CMake 3.23.0
+        if: ${{ matrix.os != 'windows-11-arm' }}
         uses: ./
         with:
           version: 3.23.0
 
       - name: Install CMake where version has quotes
+        if: ${{ matrix.os != 'windows-11-arm' }}
         uses: ./
         with:
           version: '3.23.0'
 
       - name: Install CMake 3.20.0 (minimum)
+        if: ${{ matrix.os != 'windows-11-arm' }}
         uses: ./
         with:
           version: 3.20.0
+
+      - name: Install CMake 3.23.0 (Windows ARM not supported before 3.24.0)
+        if: ${{ matrix.os == 'windows-11-arm' }}
+        uses: ./
+        with:
+          version: 3.23.0
+        continue-on-error: true
 
       - name: Install CMake 3.19.0 (not supported)
         uses: ./

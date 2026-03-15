@@ -88,6 +88,13 @@ class CMakeInstall:
 
         cmake_platform, cmake_archive_ext, cmake_binary_dir = get_cmake_platform()
 
+        if cmake_platform == "windows-arm64":
+            windows_arm_min = "3.24.0"
+            if version.parse(_norm(self.version)) < version.parse(windows_arm_min):
+                print(f"CMake version '{self.version}' is not available for Windows ARM64, "
+                    f"the version must be {windows_arm_min} or higher.", flush=True)
+                sys.exit(1)
+
         cmake_dir = f"cmake-{self.version}-{cmake_platform}"
         self.archive = f"{cmake_dir}{cmake_archive_ext}"
         self.url = f"{self.cmake_url}/download/v{self.version}/{self.archive}"
