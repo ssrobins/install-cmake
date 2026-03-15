@@ -1,0 +1,23 @@
+name: Update v1 tag
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  update-tag:
+    name: Update v1 tag to latest main
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Update v1 tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f v1
+          git push origin v1 --force
