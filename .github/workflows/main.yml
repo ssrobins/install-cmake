@@ -76,6 +76,12 @@ jobs:
         with:
           version: '3.24.0'
 
+      - name: Install CMake 3.20.0 (minimum)
+        if: ${{ matrix.os != 'windows-11-arm' }}
+        uses: ./
+        with:
+          version: 3.20.0
+
       - name: Install CMake 3.19.0 (not supported)
         uses: ./
         with:
