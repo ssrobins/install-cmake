@@ -32,6 +32,27 @@ def get_cmake_version(cmake_version_output):
     return cmake_version
 
 
+def get_cmake_platform():
+    system = platform.system()
+    machine = (platform.machine() or "").lower()
+    if system == "Darwin":
+        return "macos-universal", ".tar.gz", "CMake.app/Contents/bin"
+    arch_map = {
+        "x86_64": ("x86_64", "x86_64"),
+        "amd64": ("x86_64", "x86_64"),
+        "aarch64": ("aarch64", "arm64"),
+        "arm64": ("aarch64", "arm64"),
+    }
+    if machine not in arch_map:
+        raise RuntimeError(f"Unsupported architecture: {platform.machine()}")
+    linux_arch, windows_arch = arch_map[machine]
+    if system == "Linux":
+        return f"linux-{linux_arch}", ".tar.gz", "bin"
+    if system == "Windows":
+        return f"windows-{windows_arch}", ".zip", "bin"
+    raise RuntimeError(f"Unsupported platform: {system}")
+
+
 class CMakeInstall:
     def __init__(self, cmake_version_raw, release_candidate):
         if release_candidate:
@@ -65,20 +86,14 @@ class CMakeInstall:
             print("https://github.com/ssrobins/install-cmake/issues", flush=True)
             sys.exit(1)
 
-        if platform.system() == "Darwin":
-            cmake_platform = "macos-universal"
-            cmake_archive_ext = ".tar.gz"
-            cmake_binary_dir = "CMake.app/Contents/bin"
-        elif platform.system() == "Linux":
-            cmake_platform = "linux-x86_64"
-            cmake_archive_ext = ".tar.gz"
-            cmake_binary_dir = "bin"
-        elif platform.system() == "Windows":
-            cmake_platform = "windows-x86_64"
-            cmake_archive_ext = ".zip"
-            cmake_binary_dir = "bin"
-        else:
-            raise RuntimeError(f"Unsupported platform: {platform.system()}")
+        cmake_platform, cmake_archive_ext, cmake_binary_dir = get_cmake_platform()
+
+        if cmake_platform == "windows-arm64":
+            windows_arm_min = "3.24.0"
+            if version.parse(_norm(self.version)) < version.parse(windows_arm_min):
+                print(f"CMake version '{self.version}' is not available for Windows ARM64, "
+                    f"the version must be {windows_arm_min} or higher.", flush=True)
+                sys.exit(1)
 
         cmake_dir = f"cmake-{self.version}-{cmake_platform}"
         self.archive = f"{cmake_dir}{cmake_archive_ext}"

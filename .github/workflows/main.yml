@@ -19,6 +19,8 @@ jobs:
           macos-26,
           ubuntu-22.04,
           ubuntu-24.04,
+          ubuntu-24.04-arm,
+          windows-11-arm,
           windows-2022,
           windows-2025
         ]
@@ -64,17 +66,18 @@ jobs:
         with:
           release-candidate: true
 
-      - name: Install CMake 3.23.0
+      - name: Install CMake 3.24.0
         uses: ./
         with:
-          version: 3.23.0
+          version: 3.24.0
 
       - name: Install CMake where version has quotes
         uses: ./
         with:
-          version: '3.23.0'
+          version: '3.24.0'
 
       - name: Install CMake 3.20.0 (minimum)
+        if: ${{ matrix.os != 'windows-11-arm' }}
         uses: ./
         with:
           version: 3.20.0
